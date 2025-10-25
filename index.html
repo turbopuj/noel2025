@@ -28,12 +28,14 @@
   --color-orange-400: rgba(230, 129, 97, 1);
   --color-orange-500: rgba(168, 75, 47, 1);
   --color-green-500: rgba(34, 197, 94, 1);
+  --color-yellow-500: rgba(234, 179, 8, 1);
 
   --color-brown-600-rgb: 94, 82, 64;
   --color-teal-500-rgb: 33, 128, 141;
   --color-slate-900-rgb: 19, 52, 59;
   --color-red-500-rgb: 192, 21, 47;
   --color-green-500-rgb: 34, 197, 94;
+  --color-yellow-500-rgb: 234, 179, 8;
 
   --color-background: var(--color-cream-50);
   --color-surface: var(--color-cream-100);
@@ -44,6 +46,7 @@
   --color-border: rgba(var(--color-brown-600-rgb), 0.2);
   --color-error: var(--color-red-500);
   --color-success: var(--color-green-500);
+  --color-warning: var(--color-yellow-500);
 
   --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-size-sm: 12px;
@@ -109,24 +112,40 @@ body {
 .stat { text-align: center; }
 .stat-value { font-size: var(--font-size-2xl); font-weight: 600; color: var(--color-primary); }
 .stat-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: var(--space-4); }
+
+/* Timer spécial */
+.timer-display {
+  text-align: center; margin-bottom: var(--space-16); padding: var(--space-16);
+  background: rgba(var(--color-yellow-500-rgb), 0.2); border: 2px solid var(--color-warning);
+  border-radius: var(--radius-base); font-size: var(--font-size-2xl); font-weight: 600;
+  color: var(--color-warning);
+}
+.timer-display.expired { background: rgba(var(--color-red-500-rgb), 0.2); border-color: var(--color-error); color: var(--color-error); }
+
 .players { display: flex; justify-content: space-around; margin-bottom: var(--space-24); gap: var(--space-8); }
 .player { text-align: center; padding: var(--space-12); border-radius: var(--radius-base); background: var(--color-background); flex: 1; transition: all 0.3s ease; }
 .player.active { background: rgba(var(--color-teal-500-rgb), 0.2); border: 2px solid var(--color-primary); }
 .player.waiting { opacity: 0.6; }
+.player.first { background: rgba(var(--color-yellow-500-rgb), 0.2); border: 2px solid var(--color-warning); }
 .player-name { font-weight: 600; margin-bottom: var(--space-4); }
 .player-status { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
 .player-status.selected { color: var(--color-success); font-weight: 600; }
+.player-status.first { color: var(--color-warning); font-weight: 600; }
+
 .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-12); margin-bottom: var(--space-24); }
 @media (min-width: 480px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+
 .card {
   aspect-ratio: 1; border-radius: var(--radius-lg); cursor: pointer; position: relative; transition: all 0.3s ease;
   background: var(--color-background); border: 3px solid var(--color-border);
   overflow: hidden; -webkit-overflow-scrolling: touch; isolation: isolate;
 }
-.card:hover:not(.revealed):not(.selected) { transform: scale(1.05); box-shadow: var(--shadow-md); }
+.card:hover:not(.revealed):not(.selected):not(.disabled) { transform: scale(1.05); box-shadow: var(--shadow-md); }
 .card.selected { border-color: var(--color-primary); box-shadow: 0 0 0 4px rgba(var(--color-teal-500-rgb), 0.3); transform: scale(1.05); }
 .card.selected .card-inner { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); transition: transform 0.6s; }
 .card.revealed { border-color: var(--color-success); cursor: default; }
+.card.disabled { opacity: 0.5; cursor: not-allowed; }
+
 .card-inner {
   width: 100%; height: 100%; position: relative; -webkit-transform-style: preserve-3d; transform-style: preserve-3d;
   -webkit-transform: translateZ(0); transform: translateZ(0); transition: transform 0.6s;
@@ -141,14 +160,18 @@ body {
   display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain;
   -webkit-user-drag: none; user-select: none; border-radius: inherit; background: transparent;
 }
+
 .message { text-align: center; padding: var(--space-16); border-radius: var(--radius-base); margin-bottom: var(--space-16); font-weight: 500; }
 .message.success { background: rgba(var(--color-green-500-rgb), 0.15); color: var(--color-success); border: 2px solid var(--color-success); }
 .message.error { background: rgba(var(--color-red-500-rgb), 0.15); color: var(--color-error); border: 2px solid var(--color-error); }
 .message.info { background: rgba(var(--color-teal-500-rgb), 0.15); color: var(--color-primary); border: 2px solid var(--color-primary); }
+.message.warning { background: rgba(var(--color-yellow-500-rgb), 0.15); color: var(--color-warning); border: 2px solid var(--color-warning); }
+
 .btn { width: 100%; padding: var(--space-16); border: none; border-radius: var(--radius-base); font-size: var(--font-size-lg); font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
 .btn-primary { background: var(--color-primary); color: var(--color-white); }
 .btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
 .waiting-screen { text-align: center; padding: var(--space-32); }
 .waiting-screen h2 { font-size: var(--font-size-2xl); margin-bottom: var(--space-24); color: var(--color-text); }
 .player-list { margin: var(--space-24) 0; }
@@ -158,11 +181,14 @@ body {
   background: var(--color-background); font-size: var(--font-size-lg);
 }
 .player-item.ready { background: rgba(var(--color-green-500-rgb), 0.15); }
+
 .confetti { position: fixed; width: 10px; height: 10px; background: var(--christmas-gold); position: absolute; animation: confetti-fall 3s linear; }
 @keyframes confetti-fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+
 .victory-screen { text-align: center; padding: var(--space-32); }
 .victory-screen h2 { font-size: var(--font-size-3xl); color: var(--christmas-red); margin-bottom: var(--space-24); }
 .victory-time { font-size: var(--font-size-2xl); color: var(--color-primary); margin-bottom: var(--space-32); font-weight: 600; }
+
 .hidden { display: none !important; }
   </style>
 </head>
@@ -184,15 +210,23 @@ body {
     <!-- Écran de jeu -->
     <div id="gameScreen" class="hidden">
       <div class="header"><h1>🎄 Memory de Noël 🎁</h1></div>
+      
+      <!-- Timer compte à rebours -->
+      <div id="timerDisplay" class="timer-display hidden">
+        ⏱️ Temps restant: <span id="timerSeconds">10</span>s
+      </div>
+
       <div class="stats">
         <div class="stat"><div class="stat-value" id="foundCount">0/10</div><div class="stat-label">Trouvées</div></div>
-        <div class="stat"><div class="stat-value" id="timer">0:00</div><div class="stat-label">Temps</div></div>
+        <div class="stat"><div class="stat-value" id="gameTimer">0:00</div><div class="stat-label">Temps total</div></div>
       </div>
+      
       <div class="players">
         <div class="player" id="leonPlayer"><div class="player-name">👦 Léon</div><div class="player-status" id="leonStatus">En attente...</div></div>
         <div class="player" id="capucinePlayer"><div class="player-name">👧 Capucine</div><div class="player-status" id="capucineStatus">En attente...</div></div>
         <div class="player" id="firminPlayer"><div class="player-name">👦 Firmin</div><div class="player-status" id="firminStatus">En attente...</div></div>
       </div>
+      
       <div id="messageBox" class="message hidden"></div>
       <div class="grid" id="cardGrid"></div>
       <button class="btn btn-primary hidden" id="resetBtn">Rejouer 🔄</button>
@@ -208,7 +242,7 @@ body {
   </div>
 
   <script type="module">
-    // Firebase config (en ligne)
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAfiNtWKwVGmKPs0tgicoXwj5nVkhZn9zc",
       authDomain: "noel2025-robert.firebaseapp.com",
@@ -223,7 +257,7 @@ body {
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, set, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-    // Init Firebase + garde DB
+    // Init Firebase
     let app, database;
     try {
       app = initializeApp(firebaseConfig);
@@ -235,7 +269,7 @@ body {
 
     const hasDB = !!database;
 
-    // URL params / joueurs valides
+    // URL params
     const urlParams = new URLSearchParams(window.location.search);
     const currentPlayer = urlParams.get('player') || 'leon';
     const validPlayers = ['leon', 'capucine', 'firmin'];
@@ -243,11 +277,11 @@ body {
       alert('Joueur invalide ! Utilisez ?player=leon, ?player=capucine ou ?player=firmin');
     }
 
-    // Refs conditionnelles
-    const gameRef       = hasDB ? ref(database, 'game_session') : null;
-    const playersRef    = hasDB ? ref(database, 'game_session/players') : null;
-    const selectionsRef = hasDB ? ref(database, 'game_session/current_selections') : null;
-    const revealedRef   = hasDB ? ref(database, 'game_session/revealed_images') : null;
+    // Refs Firebase
+    const gameRef         = hasDB ? ref(database, 'game_session') : null;
+    const playersRef      = hasDB ? ref(database, 'game_session/players') : null;
+    const gameStateRef    = hasDB ? ref(database, 'game_session/game_state') : null;
+    const revealedRef     = hasDB ? ref(database, 'game_session/revealed_images') : null;
 
     // Éléments DOM
     const waitingScreen = document.getElementById('waitingScreen');
@@ -258,21 +292,41 @@ body {
     const playAgainBtn = document.getElementById('playAgainBtn');
     const cardGrid = document.getElementById('cardGrid');
     const messageBox = document.getElementById('messageBox');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerSeconds = document.getElementById('timerSeconds');
 
-    // État
+    // État du jeu
     let myOrder = [];
-    let startTime = null;
-    let timerInterval = null;
+    let gameStartTime = null;
+    let gameTimerInterval = null;
+    let countdownInterval = null;
+
+    // États possibles: 'idle', 'waiting', 'evaluating'
+    let currentGameState = 'idle';
 
     // Helpers UI
-    function showMessage(text, type) {
+    function showMessage(text, type = 'info') {
       messageBox.textContent = text;
       messageBox.className = `message ${type}`;
       messageBox.classList.remove('hidden');
       setTimeout(() => messageBox.classList.add('hidden'), 3000);
     }
 
-    // Ordre aléatoire (pic1..pic10)
+    function showTimer(seconds) {
+      timerSeconds.textContent = seconds;
+      timerDisplay.classList.remove('hidden', 'expired');
+    }
+
+    function hideTimer() {
+      timerDisplay.classList.add('hidden');
+    }
+
+    function expireTimer() {
+      timerDisplay.classList.add('expired');
+      timerSeconds.textContent = '0';
+    }
+
+    // Ordre aléatoire
     function generateRandomOrder() {
       const order = Array.from({ length: 10 }, (_, i) => `pic${i + 1}`);
       for (let i = order.length - 1; i > 0; i--) {
@@ -282,7 +336,7 @@ body {
       return order;
     }
 
-    // Initialisation joueur — robuste
+    // Init joueur
     async function initPlayer() {
       try {
         if (!hasDB) throw new Error('Database non initialisée');
@@ -295,7 +349,6 @@ body {
         console.error('initPlayer error:', e);
         showMessage('Impossible de rejoindre la session. Vérifiez la connexion Firebase.', 'error');
       } finally {
-        // On active le bouton quoi qu’il arrive pour éviter un blocage UX
         readyBtn.disabled = false;
       }
     }
@@ -305,18 +358,34 @@ body {
       waitingScreen.classList.add('hidden');
       gameScreen.classList.remove('hidden');
 
-      startTime = Date.now();
-      startTimer();
-
+      gameStartTime = Date.now();
+      startGameTimer();
       createCards();
 
       if (hasDB) {
-        set(selectionsRef, {});
+        // Initialiser l'état du jeu
+        set(gameStateRef, {
+          phase: 'idle',
+          firstPlayer: null,
+          timerEnd: null,
+          currentSelections: {}
+        });
         set(revealedRef, []);
       }
     }
 
-    // Créer les cartes (PNG uniquement)
+    // Timer du jeu total
+    function startGameTimer() {
+      gameTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        const gt = document.getElementById('gameTimer');
+        if (gt) gt.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    // Créer les cartes
     function createCards() {
       cardGrid.innerHTML = '';
       myOrder.forEach((imageId, index) => {
@@ -336,12 +405,12 @@ body {
       });
     }
 
-    // Sélection d’une carte — robuste
+    // Sélection d'une carte
     async function selectCard(imageId, cardElement) {
       try {
         if (!hasDB) throw new Error('Database non initialisée');
 
-        // Vérifier déjà révélée
+        // Vérifier si déjà révélée
         const revealed = await new Promise(resolve => {
           onValue(revealedRef, (snapshot) => {
             resolve(snapshot.val() || []);
@@ -349,31 +418,144 @@ body {
         });
         if (revealed.includes(imageId)) return;
 
-        if (cardElement.classList.contains('selected')) return;
+        // Vérifier l'état du jeu
+        const gameState = await new Promise(resolve => {
+          onValue(gameStateRef, (snapshot) => {
+            resolve(snapshot.val() || {});
+          }, { onlyOnce: true });
+        });
 
-        // Sélection locale
+        // Logique selon la phase
+        if (gameState.phase === 'idle') {
+          // Premier joueur à cliquer
+          await update(gameStateRef, {
+            phase: 'waiting',
+            firstPlayer: currentPlayer,
+            timerEnd: Date.now() + 10000, // 10 secondes
+            currentSelections: { [currentPlayer]: imageId }
+          });
+          
+          showMessage(`${currentPlayer} a choisi en premier ! ⏱️ 10 secondes pour les autres !`, 'warning');
+          
+        } else if (gameState.phase === 'waiting') {
+          // Joueur suivant
+          if (gameState.firstPlayer === currentPlayer) {
+            showMessage('Vous avez déjà choisi ! Attendez les autres joueurs.', 'warning');
+            return;
+          }
+          
+          // Ajouter la sélection
+          const newSelections = { ...gameState.currentSelections, [currentPlayer]: imageId };
+          await update(ref(database, 'game_session/game_state/currentSelections'), newSelections);
+          
+        } else if (gameState.phase === 'evaluating') {
+          showMessage('Évaluation en cours, patientez...', 'info');
+          return;
+        }
+
+        // Mise à jour visuelle locale
         document.querySelectorAll('.card.selected').forEach(c => {
           if (c.dataset.imageId !== imageId) c.classList.remove('selected');
         });
         cardElement.classList.add('selected');
 
-        // Enregistrer sélection
-        await set(ref(database, `game_session/current_selections/${currentPlayer}`), imageId);
       } catch (e) {
         console.error('selectCard error:', e);
-        showMessage('Sélection impossible (connexion).', 'error');
+        showMessage('Sélection impossible.', 'error');
       }
     }
 
-    // Listeners Firebase (attachés seulement si DB ok)
+    // Timer compte à rebours
+    function startCountdown(endTime) {
+      if (countdownInterval) clearInterval(countdownInterval);
+      
+      countdownInterval = setInterval(() => {
+        const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+        
+        if (remaining > 0) {
+          showTimer(remaining);
+        } else {
+          clearInterval(countdownInterval);
+          expireTimer();
+          // Le timer sera géré par le listener gameState
+        }
+      }, 100);
+    }
+
+    // Évaluer les sélections
+    async function evaluateSelections(gameState) {
+      try {
+        if (!hasDB) return;
+
+        await update(gameStateRef, { phase: 'evaluating' });
+
+        const selections = gameState.currentSelections || {};
+        const selectionValues = Object.values(selections);
+        const allPlayersSelected = Object.keys(selections).length === 3;
+
+        let success = false;
+
+        if (allPlayersSelected && selectionValues[0] === selectionValues[1] && selectionValues[1] === selectionValues[2]) {
+          // Succès !
+          const imageId = selectionValues[0];
+          success = true;
+
+          // Ajouter aux révélées
+          const revealed = await new Promise(resolve => {
+            onValue(revealedRef, (snapshot) => {
+              resolve(snapshot.val() || []);
+            }, { onlyOnce: true });
+          });
+
+          if (!revealed.includes(imageId)) {
+            revealed.push(imageId);
+            await set(revealedRef, revealed);
+          }
+
+          showMessage('🎉 Parfait ! Image trouvée ! +1 point', 'success');
+          createConfetti();
+
+          // Victoire totale ?
+          if (revealed.length === 10) {
+            setTimeout(() => showVictory(), 1000);
+            return;
+          }
+
+        } else {
+          // Échec
+          if (allPlayersSelected) {
+            showMessage('❌ Images différentes ! Essayez encore cette carte.', 'error');
+          } else {
+            showMessage('⏰ Temps écoulé ! Essayez encore cette carte.', 'error');
+          }
+        }
+
+        // Reset pour le prochain tour
+        setTimeout(async () => {
+          await set(gameStateRef, {
+            phase: 'idle',
+            firstPlayer: null,
+            timerEnd: null,
+            currentSelections: {}
+          });
+          hideTimer();
+        }, 2000);
+
+      } catch (e) {
+        console.error('evaluateSelections error:', e);
+      }
+    }
+
+    // Listeners Firebase
     if (hasDB) {
-      // Écoute joueurs
+      // Écoute joueurs (prêts)
       onValue(playersRef, (snapshot) => {
         const players = snapshot.val() || {};
         ['leon', 'capucine', 'firmin'].forEach(player => {
           const statusEl = document.getElementById(`status${player.charAt(0).toUpperCase() + player.slice(1)}`);
           const playerEl = document.getElementById(`player${player.charAt(0).toUpperCase() + player.slice(1)}`);
           if (!statusEl || !playerEl) return;
+          
           if (players[player]?.ready) {
             statusEl.textContent = '✅ Prêt !';
             statusEl.style.color = 'var(--color-success)';
@@ -386,42 +568,100 @@ body {
         });
 
         const allReady = ['leon', 'capucine', 'firmin'].every(p => players[p]?.ready);
-        if (allReady && !startTime) setTimeout(startGame, 1000);
+        if (allReady && !gameStartTime) {
+          setTimeout(startGame, 1000);
+        }
       });
 
-      // Écoute sélections
-      onValue(selectionsRef, (snapshot) => {
-        const selections = snapshot.val() || {};
+      // Écoute état du jeu
+      onValue(gameStateRef, (snapshot) => {
+        const gameState = snapshot.val() || {};
+        currentGameState = gameState.phase || 'idle';
 
-        // Statuts joueurs
-        ['leon', 'capucine', 'firmin'].forEach(player => {
-          const statusEl = document.getElementById(`${player}Status`);
-          const playerEl = document.getElementById(`${player}Player`);
-          if (!statusEl || !playerEl) return;
-          if (selections[player]) {
-            statusEl.textContent = '✅ A choisi';
-            statusEl.classList.add('selected');
-            playerEl.classList.add('active');
-          } else {
-            statusEl.textContent = '⏳ En attente...';
-            statusEl.classList.remove('selected');
-            playerEl.classList.remove('active');
+        // Gestion des phases
+        if (gameState.phase === 'waiting') {
+          // Démarrer le compte à rebours
+          if (gameState.timerEnd) {
+            startCountdown(gameState.timerEnd);
           }
-        });
 
-        // Synchro visuelle cartes
-        document.querySelectorAll('.card').forEach(card => {
-          if (!card.classList.contains('revealed')) card.classList.remove('selected');
-        });
-        Object.values(selections).forEach(selectedImageId => {
-          if (!selectedImageId) return;
-          document.querySelectorAll(`.card[data-image-id="${selectedImageId}"]`).forEach(card => {
-            if (!card.classList.contains('revealed')) card.classList.add('selected');
+          // Mise à jour des statuts joueurs
+          ['leon', 'capucine', 'firmin'].forEach(player => {
+            const statusEl = document.getElementById(`${player}Status`);
+            const playerEl = document.getElementById(`${player}Player`);
+            if (!statusEl || !playerEl) return;
+
+            // Reset classes
+            playerEl.classList.remove('first', 'active', 'waiting');
+            statusEl.classList.remove('first', 'selected');
+
+            if (gameState.firstPlayer === player) {
+              statusEl.textContent = '🎯 A choisi en premier';
+              statusEl.classList.add('first');
+              playerEl.classList.add('first');
+            } else if (gameState.currentSelections?.[player]) {
+              statusEl.textContent = '✅ A choisi';
+              statusEl.classList.add('selected');
+              playerEl.classList.add('active');
+            } else {
+              statusEl.textContent = '⏳ Choisit...';
+              playerEl.classList.add('waiting');
+            }
           });
-        });
 
-        // 3 sélections => vérification
-        if (Object.keys(selections).length === 3) checkMatch(selections);
+          // Vérifier si tous ont choisi ou si le timer expire
+          const selections = gameState.currentSelections || {};
+          const allSelected = Object.keys(selections).length === 3;
+          const timerExpired = Date.now() > (gameState.timerEnd || 0);
+
+          if (allSelected || timerExpired) {
+            evaluateSelections(gameState);
+          }
+
+          // Mise à jour visuelle des cartes
+          document.querySelectorAll('.card').forEach(card => {
+            if (!card.classList.contains('revealed')) {
+              card.classList.remove('selected');
+              // Désactiver les cartes pour le premier joueur
+              if (gameState.firstPlayer === currentPlayer) {
+                card.classList.add('disabled');
+              } else {
+                card.classList.remove('disabled');
+              }
+            }
+          });
+
+          // Montrer les sélections
+          Object.values(selections).forEach(selectedImageId => {
+            if (!selectedImageId) return;
+            document.querySelectorAll(`.card[data-image-id="${selectedImageId}"]`).forEach(card => {
+              if (!card.classList.contains('revealed')) {
+                card.classList.add('selected');
+              }
+            });
+          });
+
+        } else if (gameState.phase === 'idle') {
+          // Phase d'attente
+          hideTimer();
+          
+          ['leon', 'capucine', 'firmin'].forEach(player => {
+            const statusEl = document.getElementById(`${player}Status`);
+            const playerEl = document.getElementById(`${player}Player`);
+            if (!statusEl || !playerEl) return;
+
+            statusEl.textContent = 'Choisissez une carte';
+            statusEl.classList.remove('first', 'selected');
+            playerEl.classList.remove('first', 'active', 'waiting');
+          });
+
+          // Réactiver toutes les cartes
+          document.querySelectorAll('.card').forEach(card => {
+            if (!card.classList.contains('revealed')) {
+              card.classList.remove('selected', 'disabled');
+            }
+          });
+        }
       });
 
       // Écoute images révélées
@@ -429,19 +669,21 @@ body {
         const revealed = snapshot.val() || [];
         const fc = document.getElementById('foundCount');
         if (fc) fc.textContent = `${revealed.length}/10`;
+        
         revealed.forEach(imageId => {
           document.querySelectorAll(`.card[data-image-id="${imageId}"]`).forEach(card => {
             card.classList.add('revealed');
+            card.classList.remove('selected', 'disabled');
           });
         });
       });
+
     } else {
-      // Mode dégradé: activer le bouton pour ne pas bloquer l’UI
       readyBtn.disabled = false;
-      showMessage('Firebase indisponible. Vérifiez la configuration.', 'error');
+      showMessage('Firebase indisponible.', 'error');
     }
 
-    // Click "Je suis prêt" — robuste
+    // Click "Je suis prêt"
     readyBtn.addEventListener('click', async () => {
       readyBtn.disabled = true;
       try {
@@ -449,65 +691,10 @@ body {
         await update(ref(database, `game_session/players/${currentPlayer}`), { ready: true });
       } catch (e) {
         console.error('ready click error:', e);
-        showMessage('Impossible de signaler “Prêt”. Vérifiez la connexion.', 'error');
-        readyBtn.disabled = false; // redonner la main
+        showMessage('Impossible de signaler "Prêt".', 'error');
+        readyBtn.disabled = false;
       }
     });
-
-    // Vérifier correspondance
-    async function checkMatch(selections) {
-      const [sel1, sel2, sel3] = Object.values(selections);
-      try {
-        if (!hasDB) throw new Error('Database non initialisée');
-
-        if (sel1 === sel2 && sel2 === sel3) {
-          showMessage('🎉 Bravo ! Image trouvée !', 'success');
-
-          const revealed = await new Promise(resolve => {
-            onValue(revealedRef, (snapshot) => {
-              resolve(snapshot.val() || []);
-            }, { onlyOnce: true });
-          });
-
-          if (!revealed.includes(sel1)) {
-            revealed.push(sel1);
-            await set(revealedRef, revealed);
-          }
-
-          setTimeout(() => {
-            document.querySelectorAll(`.card[data-image-id="${sel1}"]`).forEach(card => {
-              card.classList.add('revealed');
-              card.classList.remove('selected');
-            });
-          }, 300);
-
-          createConfetti();
-
-          if (revealed.length === 10) setTimeout(showVictory, 1000);
-        } else {
-          showMessage('❌ Images différentes ! Réessayez.', 'error');
-          setTimeout(() => {
-            document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
-          }, 1500);
-        }
-      } catch (e) {
-        console.error('checkMatch error:', e);
-        showMessage('Erreur de synchronisation. Réessayez.', 'error');
-      } finally {
-        if (hasDB) setTimeout(() => set(selectionsRef, {}), 2000);
-      }
-    }
-
-    // Timer
-    function startTimer() {
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        const minutes = Math.floor(elapsed / 60);
-        const seconds = elapsed % 60;
-        const t = document.getElementById('timer');
-        if (t) t.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      }, 1000);
-    }
 
     // Confettis
     function createConfetti() {
@@ -525,20 +712,23 @@ body {
 
     // Victoire
     function showVictory() {
-      clearInterval(timerInterval);
+      clearInterval(gameTimerInterval);
+      clearInterval(countdownInterval);
       gameScreen.classList.add('hidden');
       victoryScreen.classList.remove('hidden');
 
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
       const minutes = Math.floor(elapsed / 60);
       const seconds = elapsed % 60;
       const ft = document.getElementById('finalTime');
       if (ft) ft.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-      for (let i = 0; i < 100; i++) setTimeout(() => createConfetti(), i * 50);
+      for (let i = 0; i < 100; i++) {
+        setTimeout(() => createConfetti(), i * 50);
+      }
     }
 
-    // Rejouer / Reset
+    // Reset / Rejouer
     playAgainBtn.addEventListener('click', async () => {
       try {
         if (hasDB) await remove(gameRef);
@@ -546,6 +736,7 @@ body {
         location.reload();
       }
     });
+
     resetBtn.addEventListener('click', async () => {
       try {
         if (hasDB) await remove(gameRef);
