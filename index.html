@@ -206,8 +206,7 @@ body {
 /* FIX for Safari overflow / transform issues:
    - Safari can let transformed children escape parent's border-radius.
    - Adding overflow:hidden on the card and vendor-prefixed 3D/backface rules
-     prevents images / faces from "overflowing" the rounded corners.
-*/
+     prevents images / faces from "overflowing" the rounded corners. */
 .card {
   aspect-ratio: 1;
   border-radius: var(--radius-lg);
@@ -293,8 +292,7 @@ body {
 /* Display the image "contained" inside the square card:
    - max-width/max-height ensure the image never overflows and keeps its aspect ratio
    - width/height auto prevents stretching
-   - object-fit: contain is kept for browsers that respect it
-*/
+   - object-fit: contain is kept for browsers that respect it */
 .card-front img {
   display: block;
   width: auto;
@@ -646,8 +644,7 @@ body {
                         <div class="card-face card-back">🎁</div>
                         <div class="card-face card-front">
                             <img src="images/${imageId}.png" alt="Image ${index + 1}"
-                                 onerror="this.onerror=null; this.src='images/${imageId}.jpg'; this.onerror=function(){this.src='images/${imageId}.jpeg'; this.onerror=function(){this.src='images/${imageId}.webp'; this.onerror=function(){this.src='images/images${index + 1}.png';}}}">
-                        </div>
+                                 onerror="this.onerror=null; this.src='images/${imageId}.jpg'; this.onerror=function(){this.src='images/${imageId}.jpeg'; this.onerror=function(){this.src='images/${ima[...]\n                        </div>
                     </div>
                 `;
                 card.addEventListener('click', () => selectCard(imageId, card));
