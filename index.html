@@ -579,7 +579,7 @@ body {
                 order: myOrder,
                 ready: false
             });
-            readyBtn.disabled = false;
+            readyBtn.disabled = false; // Activer le bouton ici
         }
 
         // Bouton "Je suis prêt"
@@ -644,7 +644,8 @@ body {
                         <div class="card-face card-back">🎁</div>
                         <div class="card-face card-front">
                             <img src="images/${imageId}.png" alt="Image ${index + 1}"
-                                 onerror="this.onerror=null; this.src='images/${imageId}.jpg'; this.onerror=function(){this.src='images/${imageId}.jpeg'; this.onerror=function(){this.src='images/${ima[...]\n                        </div>
+                                 onerror="this.onerror=null; this.src='images/${imageId}.jpg'; this.onerror=function(){this.src='images/${imageId}.jpeg'; this.onerror=function(){this.src='images/${ima[...]
+                        </div>
                     </div>
                 `;
                 card.addEventListener('click', () => selectCard(imageId, card));
