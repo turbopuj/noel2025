@@ -1,180 +1,875 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎄 Memory de Noël Collaboratif 🎁</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory de Noël Collaboratif</title>
+    <style>
+:root {
+  --color-white: rgba(255, 255, 255, 1);
+  --color-black: rgba(0, 0, 0, 1);
+  --color-cream-50: rgba(252, 252, 249, 1);
+  --color-cream-100: rgba(255, 255, 253, 1);
+  --color-gray-200: rgba(245, 245, 245, 1);
+  --color-gray-300: rgba(167, 169, 169, 1);
+  --color-gray-400: rgba(119, 124, 124, 1);
+  --color-slate-500: rgba(98, 108, 113, 1);
+  --color-brown-600: rgba(94, 82, 64, 1);
+  --color-charcoal-700: rgba(31, 33, 33, 1);
+  --color-charcoal-800: rgba(38, 40, 40, 1);
+  --color-slate-900: rgba(19, 52, 59, 1);
+  --color-teal-300: rgba(50, 184, 198, 1);
+  --color-teal-400: rgba(45, 166, 178, 1);
+  --color-teal-500: rgba(33, 128, 141, 1);
+  --color-teal-600: rgba(29, 116, 128, 1);
+  --color-teal-700: rgba(26, 104, 115, 1);
+  --color-red-400: rgba(255, 84, 89, 1);
+  --color-red-500: rgba(192, 21, 47, 1);
+  --color-orange-400: rgba(230, 129, 97, 1);
+  --color-orange-500: rgba(168, 75, 47, 1);
+  --color-green-500: rgba(34, 197, 94, 1);
+  
+  --color-brown-600-rgb: 94, 82, 64;
+  --color-teal-500-rgb: 33, 128, 141;
+  --color-slate-900-rgb: 19, 52, 59;
+  --color-red-500-rgb: 192, 21, 47;
+  --color-green-500-rgb: 34, 197, 94;
 
-<style>
-  body {
-    font-family: "Arial", sans-serif;
-    background: radial-gradient(circle at center, #f7f3ff 0%, #e5e0ff 100%);
-    text-align: center;
-    color: #21405f;
-    margin: 0;
-    padding: 20px;
+  --color-background: var(--color-cream-50);
+  --color-surface: var(--color-cream-100);
+  --color-text: var(--color-slate-900);
+  --color-text-secondary: var(--color-slate-500);
+  --color-primary: var(--color-teal-500);
+  --color-primary-hover: var(--color-teal-600);
+  --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-error: var(--color-red-500);
+  --color-success: var(--color-green-500);
+
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  
+  --radius-base: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  
+  --christmas-red: #c1272d;
+  --christmas-green: #165b33;
+  --christmas-gold: #ffd700;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: var(--color-charcoal-700);
+    --color-surface: var(--color-charcoal-800);
+    --color-text: var(--color-gray-200);
+    --color-text-secondary: rgba(167, 169, 169, 0.7);
+    --color-primary: var(--color-teal-300);
+    --color-primary-hover: var(--color-teal-400);
+    --color-border: rgba(119, 124, 124, 0.3);
+    --color-error: var(--color-red-400);
   }
+}
 
-  h1 {
-    font-size: 1.8em;
-    margin-bottom: 1em;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+body {
+  font-family: var(--font-family-base);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: var(--color-text);
+  padding: var(--space-16);
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-24);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--space-24);
+}
+
+.header h1 {
+  font-size: var(--font-size-3xl);
+  color: var(--christmas-red);
+  margin-bottom: var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--space-24);
+  padding: var(--space-16);
+  background: rgba(var(--color-teal-500-rgb), 0.1);
+  border-radius: var(--radius-base);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-4);
+}
+
+.players {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--space-24);
+  gap: var(--space-8);
+}
+
+.player {
+  text-align: center;
+  padding: var(--space-12);
+  border-radius: var(--radius-base);
+  background: var(--color-background);
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.player.active {
+  background: rgba(var(--color-teal-500-rgb), 0.2);
+  border: 2px solid var(--color-primary);
+}
+
+.player.waiting {
+  opacity: 0.6;
+}
+
+.player-name {
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+
+.player-status {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.player-status.selected {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-12);
+  margin-bottom: var(--space-24);
+}
+
+@media (min-width: 480px) {
   .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-    max-width: 600px;
-    margin: 0 auto;
+    grid-template-columns: repeat(5, 1fr);
   }
+}
 
-  .card {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    border-radius: 12px;
-    border: 3px solid rgba(33,128,141,0.3);
-    background: linear-gradient(145deg, #dcd6f7, #b8b2ff);
-    -webkit-mask-image: -webkit-radial-gradient(white, black);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    transform: translateZ(0);
-  }
+/* FIX for Safari overflow / transform issues:
+   - Safari can let transformed children escape parent's border-radius.
+   - Adding overflow:hidden on the card and vendor-prefixed 3D/backface rules
+     prevents images / faces from "overflowing" the rounded corners. */
+.card {
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  background: var(--color-background);
+  border: 3px solid var(--color-border);
 
-  .card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 12px;
-    transform: scale(1);
-    transition: transform 0.3s;
-  }
+  /* Important for Safari: clip transformed children to rounded card */
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  isolation: isolate;
+}
 
-  .card:hover img {
-    transform: scale(1.05);
-  }
+.card:hover:not(.revealed):not(.selected) {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
 
-  .card.hidden img {
-    content: url("images/card-back.jpg");
-  }
+.card.selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(var(--color-teal-500-rgb), 0.3);
+  transform: scale(1.05);
+}
 
-  .revelee {
-    outline: 4px solid #64a35b;
+/* flip the inner when selected so the image appears on click */
+.card.selected .card-inner {
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
+  transition: transform 0.6s;
+}
+
+.card.revealed {
+  border-color: var(--color-success);
+  cursor: default;
+}
+
+/* preserve-3d with vendor prefix for Safari */
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  transition: transform 0.6s;
+}
+
+/* ensure backface is hidden across browsers (Safari needs -webkit-) */
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-back {
+  background: linear-gradient(135deg, var(--christmas-red), var(--christmas-green));
+  color: var(--color-white);
+  font-size: var(--font-size-3xl);
+}
+
+/* Keep the front as a centered container with optional padding so the full image
+   can be visible while preserving its ratio. */
+.card-front {
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
+  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px; /* small padding so tall/wide images don't touch card edges */
+}
+
+/* Display the image "contained" inside the square card:
+   - max-width/max-height ensure the image never overflows and keeps its aspect ratio
+   - width/height auto prevents stretching
+   - object-fit: contain is kept for browsers that respect it */
+.card-front img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+  border-radius: inherit; /* keep inner rounding consistent with card */
+  background: transparent;
+}
+
+.message {
+  text-align: center;
+  padding: var(--space-16);
+  border-radius: var(--radius-base);
+  margin-bottom: var(--space-16);
+  font-weight: 500;
+}
+
+.message.success {
+  background: rgba(var(--color-green-500-rgb), 0.15);
+  color: var(--color-success);
+  border: 2px solid var(--color-success);
+}
+
+.message.error {
+  background: rgba(var(--color-red-500-rgb), 0.15);
+  color: var(--color-error);
+  border: 2px solid var(--color-error);
+}
+
+.message.info {
+  background: rgba(var(--color-teal-500-rgb), 0.15);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+.btn {
+  width: 100%;
+  padding: var(--space-16);
+  border: none;
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.waiting-screen {
+  text-align: center;
+  padding: var(--space-32);
+}
+
+.waiting-screen h2 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-24);
+  color: var(--color-text);
+}
+
+.player-list {
+  margin: var(--space-24) 0;
+}
+
+.player-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-12);
+  margin: var(--space-8) 0;
+  border-radius: var(--radius-base);
+  background: var(--color-background);
+  font-size: var(--font-size-lg);
+}
+
+.player-item.ready {
+  background: rgba(var(--color-green-500-rgb), 0.15);
+}
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: var(--christmas-gold);
+  position: absolute;
+  animation: confetti-fall 3s linear;
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
   }
-</style>
+}
+
+.victory-screen {
+  text-align: center;
+  padding: var(--space-32);
+}
+
+.victory-screen h2 {
+  font-size: var(--font-size-3xl);
+  color: var(--christmas-red);
+  margin-bottom: var(--space-24);
+}
+
+.victory-time {
+  font-size: var(--font-size-2xl);
+  color: var(--color-primary);
+  margin-bottom: var(--space-32);
+  font-weight: 600;
+}
+
+.hidden {
+  display: none !important;
+}
+    </style>
 </head>
 <body>
+    <div class="container">
+        <!-- Écran d'attente -->
+        <div id="waitingScreen" class="waiting-screen">
+            <div class="header">
+                <h1>🎄 Memory de Noël Collaboratif 🎁</h1>
+            </div>
+            <h2>Joueurs connectés</h2>
+            <div class="player-list">
+                <div class="player-item" id="playerLeon">
+                    <span>👦 Léon</span>
+                    <span id="statusLeon">⏳ En attente...</span>
+                </div>
+                <div class="player-item" id="playerCapucine">
+                    <span>👧 Capucine</span>
+                    <span id="statusCapucine">⏳ En attente...</span>
+                </div>
+                <div class="player-item" id="playerFirmin">
+                    <span>👦 Firmin</span>
+                    <span id="statusFirmin">⏳ En attente...</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="readyBtn" disabled>Je suis prêt !</button>
+            <p style="margin-top: var(--space-16); color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                En attente des autres joueurs...
+            </p>
+        </div>
 
-<h1>🎄 Memory de Noël Collaboratif 🎁</h1>
-<p>👥 Joueurs : Léon | Capucine | Firmin</p>
-<p id="status">⏳ En attente des joueurs...</p>
+        <!-- Écran de jeu -->
+        <div id="gameScreen" class="hidden">
+            <div class="header">
+                <h1>🎄 Memory de Noël 🎁</h1>
+            </div>
 
-<div class="grid" id="gameBoard"></div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="foundCount">0/10</div>
+                    <div class="stat-label">Trouvées</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="timer">0:00</div>
+                    <div class="stat-label">Temps</div>
+                </div>
+            </div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+            <div class="players">
+                <div class="player" id="leonPlayer">
+                    <div class="player-name">👦 Léon</div>
+                    <div class="player-status" id="leonStatus">En attente...</div>
+                </div>
+                <div class="player" id="capucinePlayer">
+                    <div class="player-name">👧 Capucine</div>
+                    <div class="player-status" id="capucineStatus">En attente...</div>
+                </div>
+                <div class="player" id="firminPlayer">
+                    <div class="player-name">👦 Firmin</div>
+                    <div class="player-status" id="firminStatus">En attente...</div>
+                </div>
+            </div>
 
-<script>
-// ---- CONFIGURATION FIREBASE ----
-const firebaseConfig = {
-  apiKey: "AIzaSyAfiNtWKwVGmKPs0tgicoXwj5nVkhZn9zc",
-  authDomain: "noel2025-robert.firebaseapp.com",
-  databaseURL: "https://noel2025-robert-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "noel2025-robert",
-  storageBucket: "noel2025-robert.firebasestorage.app",
-  messagingSenderId: "172876284151",
-  appId: "1:172876284151:web:b46253f95386aa4a7ad3f2"
-};
+            <div id="messageBox" class="message hidden"></div>
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+            <div class="grid" id="cardGrid"></div>
 
-const playerParam = new URLSearchParams(window.location.search).get("player") || "inconnu";
-const gameRef = db.ref("game_session");
-const selectionsRef = gameRef.child("current_selections");
-const revealedRef = gameRef.child("revealed_images");
+            <button class="btn btn-primary hidden" id="resetBtn">Rejouer 🔄</button>
+        </div>
 
-// ---- VARIABLES GLOBALES ----
-const board = document.getElementById("gameBoard");
-const images = Array.from({length:10}, (_,i)=>"images/images"+(i+1));
-let order = shuffle(images);
-let revealed = [];
-let ready = false;
+        <!-- Écran de victoire -->
+        <div id="victoryScreen" class="hidden victory-screen">
+            <h2>🎉 Félicitations ! 🎉</h2>
+            <p class="victory-time">Temps total : <span id="finalTime">0:00</span></p>
+            <p style="font-size: var(--font-size-lg); margin-bottom: var(--space-32); color: var(--color-text);">
+                Vous avez trouvé toutes les images ensemble ! 🎄✨
+            </p>
+            <button class="btn btn-primary" id="playAgainBtn">Rejouer 🔄</button>
+        </div>
+    </div>
 
-// ---- FONCTIONS ----
-function shuffle(array) {
-  let arr = [...array];
-  for(let i=arr.length-1; i>0; i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
-  }
-  return arr;
-}
+    <script type="module">
+        // ⚠️ CONFIGURATION FIREBASE - À REMPLACER PAR VOS CREDENTIALS
+        const firebaseConfig = {
+          apiKey: "AIzaSyAfiNtWKwVGmKPs0tgicoXwj5nVkhZn9zc",
+          authDomain: "noel2025-robert.firebaseapp.com",
+          databaseURL: "https://noel2025-robert-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "noel2025-robert",
+          storageBucket: "noel2025-robert.firebasestorage.app",
+          messagingSenderId: "172876284151",
+          appId: "1:172876284151:web:b46253f95386aa4a7ad3f2"
+        };
 
-// Crée une carte HTML
-function createCard(src, index){
-  const div = document.createElement("div");
-  div.classList.add("card","hidden");
-  const img = document.createElement("img");
-  img.src = "images/card-back.jpg";
-  img.alt = "Carte "+(index+1);
-  div.appendChild(img);
-  div.addEventListener("click", ()=>selectCard(src, div));
-  return div;
-}
+        // Import Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-// Ajout des cartes
-order.forEach((img,i)=>board.appendChild(createCard(img,i)));
+        // Initialisation Firebase
+        let app, database;
+        try {
+            app = initializeApp(firebaseConfig);
+            database = getDatabase(app);
+        } catch (error) {
+            console.error("Erreur Firebase:", error);
+            alert("⚠️ Firebase non configuré. Consultez le README pour les instructions.");
+        }
 
-// Clique sur carte
-function selectCard(imageSrc, div){
-  selectionsRef.child(playerParam).set(imageSrc);
-  div.classList.add("revelee");
-}
+        // Variables globales
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentPlayer = urlParams.get('player') || 'leon';
+        const validPlayers = ['leon', 'capucine', 'firmin'];
+        
+        if (!validPlayers.includes(currentPlayer)) {
+            alert('Joueur invalide ! Utilisez ?player=leon, ?player=capucine ou ?player=firmin');
+        }
 
-// Mise à jour Firebase -> révélation collective
-selectionsRef.on("value", snap=>{
-  const data = snap.val() || {};
-  const values = Object.values(data);
-  if(values.length===3){
-    if(values.every(v => v===values[0])){
-      revealCard(values[0]);
-      selectionsRef.set({});
-    } else {
-      resetSelections();
-    }
-  }
-});
+        const gameRef = ref(database, 'game_session');
+        const playersRef = ref(database, 'game_session/players');
+        const selectionsRef = ref(database, 'game_session/current_selections');
+        const revealedRef = ref(database, 'game_session/revealed_images');
 
-// Révèle carte visuellement
-function revealCard(imgUrl){
-  revealed.push(imgUrl);
-  revealedRef.set(revealed);
-  const cards = document.querySelectorAll(".card");
-  cards.forEach(c=>{
-    if(order.includes(imgUrl) && c.querySelector("img").src.includes("card-back")){
-      const i = order.indexOf(imgUrl);
-      if(order[i]===imgUrl){
-        const el = c.querySelector("img");
-        el.src = imgUrl;
-        c.classList.remove("hidden");
-      }
-    }
-  });
-}
+        let myOrder = [];
+        let startTime = null;
+        let timerInterval = null;
 
-// Réinitialise les sélections si erreurs
-function resetSelections(){
-  const cards = document.querySelectorAll(".card");
-  cards.forEach(c=>c.classList.remove("revelee"));
-  setTimeout(()=>selectionsRef.set({}), 1000);
-}
+        // Éléments DOM
+        const waitingScreen = document.getElementById('waitingScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const victoryScreen = document.getElementById('victoryScreen');
+        const readyBtn = document.getElementById('readyBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const cardGrid = document.getElementById('cardGrid');
+        const messageBox = document.getElementById('messageBox');
 
-revealedRef.on("value", snap=>{
-  const images = snap.val() || [];
-  images.forEach(img=>revealCard(img));
-});
-</script>
+        // Génération d'ordre aléatoire unique (pic1..pic10)
+        function generateRandomOrder() {
+            const order = Array.from({ length: 10 }, (_, i) => `pic${i + 1}`);
+            for (let i = order.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [order[i], order[j]] = [order[j], order[i]];
+            }
+            return order;
+        }
 
+        // Initialisation du joueur
+        async function initPlayer() {
+            myOrder = generateRandomOrder();
+            await set(ref(database, `game_session/players/${currentPlayer}`), {
+                order: myOrder,
+                ready: false
+            });
+            readyBtn.disabled = false; // Activer le bouton ici
+        }
+
+        // Bouton "Je suis prêt"
+        readyBtn.addEventListener('click', async () => {
+            await update(ref(database, `game_session/players/${currentPlayer}`), {
+                ready: true
+            });
+            readyBtn.disabled = true;
+        });
+
+        // Écoute des changements de joueurs
+        onValue(playersRef, (snapshot) => {
+            const players = snapshot.val() || {};
+            
+            // Mise à jour écran d'attente
+            ['leon', 'capucine', 'firmin'].forEach(player => {
+                const statusEl = document.getElementById(`status${player.charAt(0).toUpperCase() + player.slice(1)}`);
+                const playerEl = document.getElementById(`player${player.charAt(0).toUpperCase() + player.slice(1)}`);
+                
+                if (players[player]?.ready) {
+                    statusEl.textContent = '✅ Prêt !';
+                    statusEl.style.color = 'var(--color-success)';
+                    playerEl.classList.add('ready');
+                } else if (players[player]) {
+                    statusEl.textContent = '⏳ En attente...';
+                }
+            });
+
+            // Vérifier si tous sont prêts
+            const allReady = ['leon', 'capucine', 'firmin'].every(p => players[p]?.ready);
+            if (allReady && !startTime) {
+                setTimeout(startGame, 1000);
+            }
+        });
+
+        // Démarrer le jeu
+        function startGame() {
+            waitingScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            startTime = Date.now();
+            startTimer();
+            
+            // Créer les cartes
+            createCards();
+            
+            // Initialiser les sélections
+            set(selectionsRef, {});
+            set(revealedRef, []);
+        }
+
+        // Créer les cartes
+        function createCards() {
+            cardGrid.innerHTML = '';
+            myOrder.forEach((imageId, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.imageId = imageId;
+                // On essaie d'abord picN.(png|jpg|jpeg|webp), puis on fallback vers imagesN.* (ancien nom)
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-face card-back">🎁</div>
+                        <div class="card-face card-front">
+                            <img src="images/${imageId}.png" alt="Image ${index + 1}"
+                                 onerror="this.onerror=null; this.src='images/${imageId}.jpg'; this.onerror=function(){this.src='images/${imageId}.jpeg'; this.onerror=function(){this.src='images/${ima[...]
+                        </div>
+                    </div>
+                `;
+                card.addEventListener('click', () => selectCard(imageId, card));
+                cardGrid.appendChild(card);
+            });
+        }
+
+        // Sélectionner une carte
+        async function selectCard(imageId, cardElement) {
+            // Vérifier si déjà révélée
+            const revealed = await new Promise(resolve => {
+                onValue(revealedRef, (snapshot) => {
+                    resolve(snapshot.val() || []);
+                }, { onlyOnce: true });
+            });
+
+            if (revealed.includes(imageId)) {
+                console.log('Carte déjà révélée:', imageId);
+                return;
+            }
+
+            // Ne pas permettre de sélectionner si déjà sélectionné
+            if (cardElement.classList.contains('selected')) {
+                return;
+            }
+
+            // Enregistrer sélection localement en attendant la confirmation Firebase.
+            document.querySelectorAll('.card.selected').forEach(c => {
+                if (c.dataset.imageId !== imageId) {
+                    c.classList.remove('selected');
+                }
+            });
+            cardElement.classList.add('selected');
+
+            // Enregistrer sélection
+            console.log(`${currentPlayer} sélectionne:`, imageId);
+            await set(ref(database, `game_session/current_selections/${currentPlayer}`), imageId);
+        }
+
+        // Écoute des sélections
+        onValue(selectionsRef, (snapshot) => {
+            const selections = snapshot.val() || {};
+            
+            // Mise à jour des statuts joueurs
+            ['leon', 'capucine', 'firmin'].forEach(player => {
+                const statusEl = document.getElementById(`${player}Status`);
+                const playerEl = document.getElementById(`${player}Player`);
+                
+                if (selections[player]) {
+                    statusEl.textContent = '✅ A choisi';
+                    statusEl.classList.add('selected');
+                    playerEl.classList.add('active');
+                } else {
+                    statusEl.textContent = '⏳ En attente...';
+                    statusEl.classList.remove('selected');
+                    playerEl.classList.remove('active');
+                }
+            });
+
+            // --- SYNCHRO VISUELLE DES CARTES SELON LES SÉLECTIONS ---
+            // Retire toutes les classes 'selected' (sauf 'revealed')
+            document.querySelectorAll('.card').forEach(card => {
+                if (!card.classList.contains('revealed')) {
+                    card.classList.remove('selected');
+                }
+            });
+
+            // Pour chaque sélection actuelle, ajouter la classe 'selected' à la/des carte(s) correspondantes
+            Object.values(selections).forEach(selectedImageId => {
+                if (!selectedImageId) return;
+                document.querySelectorAll(`.card[data-image-id="${selectedImageId}"]`).forEach(card => {
+                    if (!card.classList.contains('revealed')) {
+                        card.classList.add('selected');
+                    }
+                });
+            });
+            // ----------------------------------------------------
+
+            // Vérifier si les 3 ont sélectionné
+            const selectionValues = Object.values(selections);
+            if (selectionValues.length === 3) {
+                checkMatch(selections);
+            }
+        });
+
+        // Vérifier la correspondance
+        async function checkMatch(selections) {
+            const [sel1, sel2, sel3] = Object.values(selections);
+            
+            console.log('Vérification des sélections:', selections);
+            
+            if (sel1 === sel2 && sel2 === sel3) {
+                // ✅ SUCCÈS
+                console.log('✅ Match trouvé pour:', sel1);
+                showMessage('🎉 Bravo ! Image trouvée !', 'success');
+                
+                // Ajouter aux images révélées
+                const revealed = await new Promise(resolve => {
+                    onValue(revealedRef, (snapshot) => {
+                        resolve(snapshot.val() || []);
+                    }, { onlyOnce: true });
+                });
+                
+                if (!revealed.includes(sel1)) {
+                    revealed.push(sel1);
+                    await set(revealedRef, revealed);
+                    console.log('Images révélées:', revealed);
+                }
+                
+                // Révéler la carte avec un petit délai pour l'animation
+                setTimeout(() => {
+                    document.querySelectorAll(`.card[data-image-id="${sel1}"]`).forEach(card => {
+                        console.log('Révélation de la carte:', card);
+                        card.classList.add('revealed');
+                        card.classList.remove('selected');
+                    });
+                }, 300);
+                
+                // Confettis
+                createConfetti();
+                
+                // Vérifier victoire
+                if (revealed.length === 10) {
+                    setTimeout(showVictory, 1000);
+                }
+                
+            } else {
+                // ❌ ÉCHEC
+                console.log('❌ Pas de match:', sel1, sel2, sel3);
+                showMessage('❌ Images différentes ! Réessayez.', 'error');
+                
+                // Montrer brièvement les sélections
+                setTimeout(() => {
+                    document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+                }, 1500);
+            }
+            
+            // Reset sélections
+            setTimeout(() => {
+                set(selectionsRef, {});
+            }, 2000);
+        }
+
+        // Écoute des images révélées
+        onValue(revealedRef, (snapshot) => {
+            const revealed = snapshot.val() || [];
+            document.getElementById('foundCount').textContent = `${revealed.length}/10`;
+            
+            // Marquer les cartes révélées
+            revealed.forEach(imageId => {
+                document.querySelectorAll(`.card[data-image-id="${imageId}"]`).forEach(card => {
+                    card.classList.add('revealed');
+                });
+            });
+        });
+
+        // Afficher message
+        function showMessage(text, type) {
+            messageBox.textContent = text;
+            messageBox.className = `message ${type}`;
+            messageBox.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Confettis
+        function createConfetti() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = ['#ffd700', '#ff6b6b', '#4ecdc4'][Math.floor(Math.random() * 3)];
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        // Victoire
+        function showVictory() {
+            clearInterval(timerInterval);
+            gameScreen.classList.add('hidden');
+            victoryScreen.classList.remove('hidden');
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('finalTime').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Confettis de victoire
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => createConfetti(), i * 50);
+            }
+        }
+
+        // Rejouer
+        playAgainBtn.addEventListener('click', async () => {
+            await remove(gameRef);
+            location.reload();
+        });
+
+        resetBtn.addEventListener('click', async () => {
+            await remove(gameRef);
+            location.reload();
+        });
+
+        // Initialisation
+        initPlayer();
+    </script>
 </body>
 </html>
