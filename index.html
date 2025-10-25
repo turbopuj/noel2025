@@ -234,6 +234,13 @@ body {
   transform: scale(1.05);
 }
 
+/* flip the inner when selected so the image appears on click */
+.card.selected .card-inner {
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
+  transition: transform 0.6s;
+}
+
 .card.revealed {
   border-color: var(--color-success);
   cursor: default;
@@ -651,13 +658,14 @@ body {
                 return;
             }
 
-            // Enlever sélection précédente de ce joueur uniquement
+            // Enregistrer sélection localement en attendant la confirmation Firebase.
+            // Ajout local de la classe 'selected' pour un retour visuel instantané.
+            // Les autres clients verront la sélection quand la DB sera mise à jour.
             document.querySelectorAll('.card.selected').forEach(c => {
                 if (c.dataset.imageId !== imageId) {
                     c.classList.remove('selected');
                 }
             });
-            
             cardElement.classList.add('selected');
 
             // Enregistrer sélection
@@ -684,6 +692,26 @@ body {
                     playerEl.classList.remove('active');
                 }
             });
+
+            // --- SYNCHRO VISUELLE DES CARTES SELON LES SÉLECTIONS ---
+            // Retire d'abord toutes les classes 'selected' (sauf 'revealed')
+            document.querySelectorAll('.card').forEach(card => {
+                if (!card.classList.contains('revealed')) {
+                    card.classList.remove('selected');
+                }
+            });
+
+            // Pour chaque sélection actuelle, ajouter la classe 'selected' à la (ou les) carte(s) correspondantes
+            Object.values(selections).forEach(selectedImageId => {
+                if (!selectedImageId) return;
+                document.querySelectorAll(`.card[data-image-id="${selectedImageId}"]`).forEach(card => {
+                    // si la carte est déjà révélée, garder 'revealed' (elle est déjà retournée)
+                    if (!card.classList.contains('revealed')) {
+                        card.classList.add('selected');
+                    }
+                });
+            });
+            // ----------------------------------------------------
 
             // Vérifier si les 3 ont sélectionné
             const selectionValues = Object.values(selections);
