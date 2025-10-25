@@ -166,12 +166,13 @@ body {
   background: var(--color-background); border: 3px solid var(--color-border);
   overflow: hidden; -webkit-overflow-scrolling: touch; isolation: isolate;
 }
-.card:hover:not(.revealed):not(.my-selected):not(.disabled) { transform: scale(1.05); box-shadow: var(--shadow-md); }
+.card:hover:not(.revealed):not(.my-selected):not(.disabled):not(.locked) { transform: scale(1.05); box-shadow: var(--shadow-md); }
 .card.my-selected { border-color: var(--color-primary); box-shadow: 0 0 0 4px rgba(var(--color-teal-500-rgb), 0.3); transform: scale(1.05); }
 .card.my-selected .card-inner { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); transition: transform 0.6s; }
 .card.revealed { border-color: var(--color-success); cursor: default; }
 .card.revealed .card-inner { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); }
 .card.disabled { opacity: 0.5; cursor: not-allowed; }
+.card.locked { opacity: 0.7; cursor: not-allowed; }
 
 .card-inner {
   width: 100%; height: 100%; position: relative; -webkit-transform-style: preserve-3d; transform-style: preserve-3d;
@@ -353,6 +354,7 @@ body {
     let gameTimerInterval = null;
     let countdownInterval = null;
     let myCurrentSelection = null;
+    let hasSelectedInCurrentRound = false; // Nouveau : verrouiller après sélection
 
     // Mode Admin
     if (isAdmin) {
@@ -377,7 +379,6 @@ body {
           try {
             if (hasDB) {
               await remove(playersRef);
-              // Réinitialiser aussi l'état du jeu
               await set(gameStateRef, {
                 phase: 'idle',
                 firstPlayer: null,
@@ -396,7 +397,6 @@ body {
         if (confirm('🚀 Forcer le démarrage du jeu ?')) {
           try {
             if (hasDB) {
-              // Mettre tous les joueurs comme prêts
               await set(playersRef, {
                 leon: { order: generateRandomOrder(), ready: true },
                 capucine: { order: generateRandomOrder(), ready: true },
@@ -467,15 +467,14 @@ Images révélées: ${(data?.revealed_images || []).length}/10
       return order;
     }
 
-    // Init joueur - version robuste avec try/catch multiple
+    // Init joueur
     async function initPlayer() {
-      if (isAdmin) return; // Skip pour admin
+      if (isAdmin) return;
       
       try {
         if (!hasDB) throw new Error('Database non initialisée');
         myOrder = generateRandomOrder();
         
-        // Tentative d'écriture avec retry
         let retries = 3;
         while (retries > 0) {
           try {
@@ -483,12 +482,12 @@ Images révélées: ${(data?.revealed_images || []).length}/10
               order: myOrder,
               ready: false
             });
-            break; // Succès
+            break;
           } catch (writeError) {
             retries--;
             console.warn(`Tentative d'écriture échouée, ${retries} essais restants:`, writeError);
             if (retries === 0) throw writeError;
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1s
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
         }
         
@@ -496,7 +495,6 @@ Images révélées: ${(data?.revealed_images || []).length}/10
         console.error('initPlayer error:', e);
         showMessage('Connexion Firebase difficile. Réessayez ou contactez l\'admin.', 'error');
       } finally {
-        // TOUJOURS activer le bouton pour éviter le blocage UX
         if (readyBtn) readyBtn.disabled = false;
       }
     }
@@ -554,7 +552,7 @@ Images révélées: ${(data?.revealed_images || []).length}/10
       });
     }
 
-    // Sélection d'une carte
+    // Sélection d'une carte - AVEC VERROUILLAGE
     async function selectCard(imageId, cardElement) {
       if (isAdmin) return;
       
@@ -568,6 +566,12 @@ Images révélées: ${(data?.revealed_images || []).length}/10
           }, { onlyOnce: true });
         });
         if (revealed.includes(imageId)) return;
+
+        // NOUVEAU : Vérifier si j'ai déjà sélectionné dans ce tour
+        if (hasSelectedInCurrentRound) {
+          showMessage('Vous avez déjà fait votre choix pour ce tour !', 'warning');
+          return;
+        }
 
         // Vérifier l'état du jeu
         const gameState = await new Promise(resolve => {
@@ -585,6 +589,9 @@ Images révélées: ${(data?.revealed_images || []).length}/10
             currentSelections: { [currentPlayer]: imageId }
           });
           
+          // NOUVEAU : Marquer que j'ai sélectionné
+          hasSelectedInCurrentRound = true;
+          
         } else if (gameState.phase === 'waiting') {
           if (gameState.firstPlayer === currentPlayer) {
             showMessage('Vous avez déjà choisi ! Attendez les autres joueurs.', 'warning');
@@ -593,6 +600,9 @@ Images révélées: ${(data?.revealed_images || []).length}/10
           
           const newSelections = { ...gameState.currentSelections, [currentPlayer]: imageId };
           await update(ref(database, 'game_session/game_state/currentSelections'), newSelections);
+          
+          // NOUVEAU : Marquer que j'ai sélectionné
+          hasSelectedInCurrentRound = true;
           
         } else if (gameState.phase === 'evaluating') {
           showMessage('Évaluation en cours, patientez...', 'info');
@@ -620,16 +630,17 @@ Images révélées: ${(data?.revealed_images || []).length}/10
 
     function clearMySelection() {
       myCurrentSelection = null;
+      hasSelectedInCurrentRound = false; // NOUVEAU : Reset du verrouillage
       document.querySelectorAll('.card').forEach(card => {
-        card.classList.remove('my-selected');
+        card.classList.remove('my-selected', 'locked');
       });
     }
 
-    // Timer compte à rebours
+    // Timer compte à rebours - AVEC TIMEOUT AUTOMATIQUE
     function startCountdown(endTime) {
       if (countdownInterval) clearInterval(countdownInterval);
       
-      countdownInterval = setInterval(() => {
+      countdownInterval = setInterval(async () => {
         const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
         
         if (remaining > 0) {
@@ -637,8 +648,34 @@ Images révélées: ${(data?.revealed_images || []).length}/10
         } else {
           clearInterval(countdownInterval);
           expireTimer();
+          
+          // NOUVEAU : Timeout automatique - pas d'attente
+          try {
+            await handleTimeout();
+          } catch (e) {
+            console.error('Erreur timeout automatique:', e);
+          }
         }
       }, 100);
+    }
+
+    // NOUVEAU : Gestion du timeout automatique
+    async function handleTimeout() {
+      if (!hasDB) return;
+      
+      showMessage('⏰ Trop tard ! Nouveau tour.', 'error');
+      
+      // Reset immédiat sans attendre
+      setTimeout(async () => {
+        hideTimer();
+        clearMySelection();
+        await set(gameStateRef, {
+          phase: 'idle',
+          firstPlayer: null,
+          timerEnd: null,
+          currentSelections: {}
+        });
+      }, 1500);
     }
 
     // Évaluer les sélections
@@ -675,11 +712,7 @@ Images révélées: ${(data?.revealed_images || []).length}/10
           }
 
         } else {
-          if (allPlayersSelected) {
-            showMessage('❌ Images différentes ! Essayez encore cette carte.', 'error');
-          } else {
-            showMessage('⏰ Temps écoulé ! Essayez encore cette carte.', 'error');
-          }
+          showMessage('❌ Images différentes ! Essayez encore cette carte.', 'error');
         }
 
         setTimeout(async () => {
@@ -758,18 +791,19 @@ Images révélées: ${(data?.revealed_images || []).length}/10
 
           const selections = gameState.currentSelections || {};
           const allSelected = Object.keys(selections).length === 3;
-          const timerExpired = Date.now() > (gameState.timerEnd || 0);
 
-          if (allSelected || timerExpired) {
+          // NOUVEAU : Pas de vérification du timer expiré ici (géré par startCountdown)
+          if (allSelected) {
             evaluateSelections(gameState);
           }
 
+          // NOUVEAU : Verrouiller les cartes après sélection
           document.querySelectorAll('.card').forEach(card => {
             if (!card.classList.contains('revealed')) {
-              if (gameState.firstPlayer === currentPlayer) {
-                card.classList.add('disabled');
+              if (gameState.firstPlayer === currentPlayer || hasSelectedInCurrentRound) {
+                card.classList.add('locked');
               } else {
-                card.classList.remove('disabled');
+                card.classList.remove('locked');
               }
             }
           });
@@ -790,7 +824,7 @@ Images révélées: ${(data?.revealed_images || []).length}/10
 
           document.querySelectorAll('.card').forEach(card => {
             if (!card.classList.contains('revealed')) {
-              card.classList.remove('disabled');
+              card.classList.remove('disabled', 'locked');
             }
           });
         }
@@ -805,7 +839,7 @@ Images révélées: ${(data?.revealed_images || []).length}/10
         revealed.forEach(imageId => {
           document.querySelectorAll(`.card[data-image-id="${imageId}"]`).forEach(card => {
             card.classList.add('revealed');
-            card.classList.remove('my-selected', 'disabled');
+            card.classList.remove('my-selected', 'disabled', 'locked');
           });
         });
       });
@@ -814,7 +848,7 @@ Images révélées: ${(data?.revealed_images || []).length}/10
       showMessage('Firebase indisponible.', 'error');
     }
 
-    // Click "Je suis prêt" - version ultra robuste
+    // Click "Je suis prêt"
     if (readyBtn) {
       readyBtn.addEventListener('click', async () => {
         if (isAdmin) return;
@@ -823,7 +857,6 @@ Images révélées: ${(data?.revealed_images || []).length}/10
         try {
           if (!hasDB) throw new Error('Database non initialisée');
           
-          // Retry avec timeout
           const timeout = new Promise((_, reject) => 
             setTimeout(() => reject(new Error('Timeout')), 5000)
           );
