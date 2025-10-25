@@ -640,13 +640,14 @@ body {
                 card.dataset.imageId = imageId;
                 // On essaie d'abord picN.(png|jpg|jpeg|webp), puis on fallback vers imagesN.* (ancien nom)
                 card.innerHTML = `
-                    <div class="card-inner">
-                        <div class="card-face card-back">🎁</div>
-                        <div class="card-face card-front">
-                            <img src="images/${imageId}.png" alt="Image ${index + 1}"
-                                 onerror="this.onerror=null; this.src='images/${imageId}.jpg'; this.onerror=function(){this.src='images/${imageId}.jpeg'; this.onerror=function(){this.src='images/${ima[...]
+                    card.innerHTML = `
+                        <div class="card-inner">
+                            <div class="card-face card-back">🎁</div>
+                            <div class="card-face card-front">
+                                <img src="images/${imageId}.png" alt="Image ${index + 1}">
+                            </div>
                         </div>
-                    </div>
+                    `;
                 `;
                 card.addEventListener('click', () => selectCard(imageId, card));
                 cardGrid.appendChild(card);
