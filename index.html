@@ -203,6 +203,11 @@ body {
   }
 }
 
+/* FIX for Safari overflow / transform issues:
+   - Safari can let transformed children escape parent's border-radius.
+   - Adding overflow:hidden on the card and vendor-prefixed 3D/backface rules
+     prevents images / faces from "overflowing" the rounded corners.
+*/
 .card {
   aspect-ratio: 1;
   border-radius: var(--radius-lg);
@@ -211,6 +216,11 @@ body {
   transition: all 0.3s ease;
   background: var(--color-background);
   border: 3px solid var(--color-border);
+
+  /* Important for Safari: clip transformed children to rounded card */
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  isolation: isolate;
 }
 
 .card:hover:not(.revealed):not(.selected) {
@@ -229,22 +239,24 @@ body {
   cursor: default;
 }
 
+/* preserve-3d with vendor prefix for Safari */
 .card-inner {
   width: 100%;
   height: 100%;
   position: relative;
+  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   transition: transform 0.6s;
 }
 
-.card.revealed .card-inner {
-  transform: rotateY(180deg);
-}
-
+/* ensure backface is hidden across browsers (Safari needs -webkit-) */
 .card-face {
   position: absolute;
   width: 100%;
   height: 100%;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   border-radius: var(--radius-lg);
   display: flex;
@@ -260,14 +272,19 @@ body {
 }
 
 .card-front {
+  -webkit-transform: rotateY(180deg);
   transform: rotateY(180deg);
   background: var(--color-white);
 }
 
 .card-front img {
+  display: block; /* remove inline gaps and ensure proper sizing */
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: inherit; /* match the card rounding */
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .message {
@@ -606,7 +623,7 @@ body {
                     <div class="card-inner">
                         <div class="card-face card-back">🎁</div>
                         <div class="card-face card-front">
-                            <img src="images/${imageId}.jpg" alt="Image ${index + 1}" onerror="this.onerror=null; this.src='images/${imageId}.png'; this.onerror=function(){this.src='images/${imageId}.gif'}">
+                            <img src="images/${imageId}.jpg" alt="Image ${index + 1}" onerror="this.onerror=null; this.src='images/${imageId}.png'; this.onerror=function(){this.src='images/${imageId}.webp';}">
                         </div>
                     </div>
                 `;
