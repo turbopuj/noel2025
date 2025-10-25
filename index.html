@@ -278,20 +278,34 @@ body {
   font-size: var(--font-size-3xl);
 }
 
+/* Keep the front as a centered container with optional padding so the full image
+   can be visible while preserving its ratio. */
 .card-front {
   -webkit-transform: rotateY(180deg);
   transform: rotateY(180deg);
   background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px; /* small padding so tall/wide images don't touch card edges */
 }
 
+/* Display the image "contained" inside the square card:
+   - max-width/max-height ensure the image never overflows and keeps its aspect ratio
+   - width/height auto prevents stretching
+   - object-fit: contain is kept for browsers that respect it
+*/
 .card-front img {
-  display: block; /* remove inline gaps and ensure proper sizing */
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: inherit; /* match the card rounding */
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   -webkit-user-drag: none;
   user-select: none;
+  border-radius: inherit; /* keep inner rounding consistent with card */
+  background: transparent;
 }
 
 .message {
@@ -550,7 +564,7 @@ body {
         const cardGrid = document.getElementById('cardGrid');
         const messageBox = document.getElementById('messageBox');
 
-        // Génération d'ordre aléatoire unique
+        // Génération d'ordre aléatoire unique (pic1..pic10)
         function generateRandomOrder() {
             const order = Array.from({ length: 10 }, (_, i) => `pic${i + 1}`);
             for (let i = order.length - 1; i > 0; i--) {
@@ -626,11 +640,13 @@ body {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.dataset.imageId = imageId;
+                // On essaie d'abord picN.(png|jpg|jpeg|webp), puis on fallback vers imagesN.* (ancien nom)
                 card.innerHTML = `
                     <div class="card-inner">
                         <div class="card-face card-back">🎁</div>
                         <div class="card-face card-front">
-                            <img src="images/${imageId}.jpg" alt="Image ${index + 1}" onerror="this.onerror=null; this.src='images/${imageId}.png'; this.onerror=function(){this.src='images/${imageId}.webp';}">
+                            <img src="images/${imageId}.png" alt="Image ${index + 1}"
+                                 onerror="this.onerror=null; this.src='images/${imageId}.jpg'; this.onerror=function(){this.src='images/${imageId}.jpeg'; this.onerror=function(){this.src='images/${imageId}.webp'; this.onerror=function(){this.src='images/images${index + 1}.png';}}}">
                         </div>
                     </div>
                 `;
@@ -659,8 +675,6 @@ body {
             }
 
             // Enregistrer sélection localement en attendant la confirmation Firebase.
-            // Ajout local de la classe 'selected' pour un retour visuel instantané.
-            // Les autres clients verront la sélection quand la DB sera mise à jour.
             document.querySelectorAll('.card.selected').forEach(c => {
                 if (c.dataset.imageId !== imageId) {
                     c.classList.remove('selected');
@@ -694,18 +708,17 @@ body {
             });
 
             // --- SYNCHRO VISUELLE DES CARTES SELON LES SÉLECTIONS ---
-            // Retire d'abord toutes les classes 'selected' (sauf 'revealed')
+            // Retire toutes les classes 'selected' (sauf 'revealed')
             document.querySelectorAll('.card').forEach(card => {
                 if (!card.classList.contains('revealed')) {
                     card.classList.remove('selected');
                 }
             });
 
-            // Pour chaque sélection actuelle, ajouter la classe 'selected' à la (ou les) carte(s) correspondantes
+            // Pour chaque sélection actuelle, ajouter la classe 'selected' à la/des carte(s) correspondantes
             Object.values(selections).forEach(selectedImageId => {
                 if (!selectedImageId) return;
                 document.querySelectorAll(`.card[data-image-id="${selectedImageId}"]`).forEach(card => {
-                    // si la carte est déjà révélée, garder 'revealed' (elle est déjà retournée)
                     if (!card.classList.contains('revealed')) {
                         card.classList.add('selected');
                     }
